@@ -248,7 +248,55 @@
       font-weight: 600;
     }
 
+    .head-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+    }
+
+    .auto-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font: inherit;
+      font-size: 13px;
+      color: var(--muted);
+      background: none;
+      border: 0;
+      padding: 4px 0;
+      cursor: pointer;
+    }
+
+    .switch-track {
+      position: relative;
+      width: 34px;
+      height: 20px;
+      border-radius: 999px;
+      background: #9fb0b3;
+      transition: background-color .15s ease;
+      flex: none;
+    }
+
+    .switch-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(20, 40, 45, .3);
+      transition: transform .15s ease;
+    }
+
+    .auto-switch[aria-checked="true"] .switch-track { background: var(--accent); }
+    .auto-switch[aria-checked="true"] .switch-knob { transform: translateX(14px); }
+
     .btn-copy {
+      min-width: 104px;
+      justify-content: center;
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -420,7 +468,7 @@
           >
           <button type="button" class="btn-generate" onclick="generateLabel()">สร้าง</button>
         </div>
-        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้างได้ทันที</p>
+        <p class="key-hint" id="keyHint">กด <kbd>Enter</kbd> เพื่อสร้างและคัดลอกให้อัตโนมัติ</p>
       </div>
     </section>
 
@@ -428,11 +476,17 @@
     <section class="card" aria-label="ผลลัพธ์">
       <div class="result-head">
         <h2>ผลลัพธ์</h2>
+        <div class="head-actions">
+        <button type="button" class="auto-switch" id="autoSwitch" role="switch" aria-checked="true" onclick="toggleAutoCopy()">
+          <span>คัดลอกอัตโนมัติ</span>
+          <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
+        </button>
         <button type="button" class="btn-copy" id="copyBtn" onclick="copyResult()" disabled>
           <svg class="ico i-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H16"/></svg>
           <svg class="ico i-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
           <span class="btn-text">คัดลอก</span>
         </button>
+        </div>
       </div>
 
       <div class="stage">
@@ -443,7 +497,7 @@
       <div id="copyToast" class="sr-only" role="status" aria-live="polite"></div>
     </section>
 
-    <p class="note">ผลลัพธ์จะถูกเลือกไว้ให้อัตโนมัติ กด <kbd>Ctrl</kbd> + <kbd>C</kbd> เพื่อคัดลอกได้เลย</p>
+    <p class="note" id="noteText">คัดลอกให้แล้ว กด <kbd>Ctrl</kbd> + <kbd>V</kbd> เพื่อวางได้เลย</p>
 
   </main>
 
@@ -463,9 +517,9 @@
 
     const MODE_HINTS = {
       normal: 'รวมถึงหนังสือ CRE / DOC',
-      rare:   'เติม ก หรือ Ra ไว้บรรทัดแรก',
-      ref:    'เติม อ หรือ R ไว้บรรทัดแรก',
-      thesis: 'เติม วพ หรือ T ไว้บรรทัดแรก'
+      rare:   'เติม ก (ไทย) หรือ Ra (อังกฤษ) ไว้บรรทัดแรก',
+      ref:    'เติม อ (ไทย) หรือ R (อังกฤษ) ไว้บรรทัดแรก',
+      thesis: 'เติม วพ (ไทย) หรือ T (อังกฤษ) ไว้บรรทัดแรก'
     };
 
     function setMode(mode) {
@@ -488,7 +542,9 @@
       const el = document.getElementById('labelPreview');
       el.innerText = text;
       el.classList.toggle('is-empty', isEmpty);
-      document.getElementById('copyBtn').disabled = isEmpty;
+      copiedState = false;
+      clearTimeout(copyTimer);
+      renderCopyBtn();
       if (!isEmpty) {
         el.classList.remove('pop');
         void el.offsetWidth;
@@ -697,7 +753,11 @@
       }
 
       setPreview(lines.join('\n'), false);
-      selectText('labelPreview');
+      // โหมดกดคัดลอกเอง: เลือกข้อความไว้ให้กด Ctrl+C ได้ทันที / โหมดอัตโนมัติ: คัดลอกให้แล้ว ไม่ต้องคลุมดำ
+      if (!autoCopy) selectText('labelPreview');
+
+      // โหมดคัดลอกอัตโนมัติ: คัดลอกทุกครั้งที่ป้ายเปลี่ยน (สร้างใหม่หรือสลับประเภท)
+      if (autoCopy) copyResult();
     }
 
     function handleKeyDown(event) {
@@ -717,28 +777,53 @@
       selection.addRange(range);
     }
 
+    // ---------- คัดลอก / คัดลอกอัตโนมัติ ----------
+    let autoCopy = true;                 // ค่าเริ่มต้น: คัดลอกอัตโนมัติ
+    try { if (localStorage.getItem('autoCopy') === '0') autoCopy = false; } catch (e) {}
+    let copiedState = false;
     let copyTimer;
-    function showCopied() {
+
+    function isResultEmpty() {
+      return document.getElementById('labelPreview').classList.contains('is-empty');
+    }
+
+    function renderCopyBtn() {
       const btn = document.getElementById('copyBtn');
-      btn.classList.add('copied');
-      btn.querySelector('.btn-text').textContent = 'คัดลอกแล้ว';
+      const empty = isResultEmpty();
+      const done = copiedState && !empty;
+      btn.disabled = empty;
+      btn.classList.toggle('copied', done);
+      btn.querySelector('.btn-text').textContent = done ? 'คัดลอกแล้ว' : 'คัดลอก';
+    }
+
+    function showCopied() {
+      copiedState = true;
+      renderCopyBtn();
       document.getElementById('copyToast').textContent = 'คัดลอกเรียบร้อย';
       clearTimeout(copyTimer);
-      copyTimer = setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.querySelector('.btn-text').textContent = 'คัดลอก';
-        document.getElementById('copyToast').textContent = '';
-      }, 2000);
+      if (!autoCopy) {
+        // โหมดกดเอง: แสดง "คัดลอกแล้ว" ชั่วครู่ แล้วกลับเป็น "คัดลอก"
+        copyTimer = setTimeout(() => {
+          copiedState = false;
+          renderCopyBtn();
+          document.getElementById('copyToast').textContent = '';
+        }, 2000);
+      }
     }
 
     function copyResult() {
       const el = document.getElementById('labelPreview');
-      if (el.classList.contains('is-empty')) return;
+      if (isResultEmpty()) return;
       const text = el.innerText;
 
       const fallback = () => {
         selectText('labelPreview');
-        try { if (document.execCommand('copy')) showCopied(); } catch (e) {}
+        try {
+          if (document.execCommand('copy')) {
+            showCopied();
+            if (autoCopy) window.getSelection().removeAllRanges();
+          }
+        } catch (e) {}
       };
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -747,7 +832,29 @@
         fallback();
       }
     }
-  
+
+    function applyAutoCopyUI() {
+      document.getElementById('autoSwitch').setAttribute('aria-checked', autoCopy ? 'true' : 'false');
+      document.getElementById('keyHint').innerHTML = autoCopy
+        ? 'กด <kbd>Enter</kbd> เพื่อสร้างและคัดลอกให้อัตโนมัติ'
+        : 'กด <kbd>Enter</kbd> เพื่อสร้างได้ทันที';
+      document.getElementById('noteText').innerHTML = autoCopy
+        ? 'คัดลอกให้แล้ว กด <kbd>Ctrl</kbd> + <kbd>V</kbd> เพื่อวางได้เลย'
+        : 'ผลลัพธ์ถูกเลือกไว้ให้แล้ว กด <kbd>Ctrl</kbd> + <kbd>C</kbd> เพื่อคัดลอกได้เลย';
+      renderCopyBtn();
+    }
+
+    function toggleAutoCopy() {
+      autoCopy = !autoCopy;
+      try { localStorage.setItem('autoCopy', autoCopy ? '1' : '0'); } catch (e) {}
+      clearTimeout(copyTimer);
+      copiedState = false;
+      document.getElementById('copyToast').textContent = '';
+      applyAutoCopyUI();
+      // เปิดโหมดอัตโนมัติขณะมีผลลัพธ์อยู่: คัดลอกผลลัพธ์ปัจจุบันให้เลย
+      if (autoCopy) window.getSelection().removeAllRanges();
+      if (autoCopy && !isResultEmpty()) copyResult();
+    }
 
     // เลือกประเภทด้วยคีย์บอร์ด: ลูกศรซ้าย/ขวา (หรือขึ้น/ลง)
     document.querySelector('.segmented').addEventListener('keydown', function (e) {
@@ -761,6 +868,8 @@
       next.focus();
       setMode(next.dataset.mode);
     });
+
+    applyAutoCopyUI();
   </script>
 </body>
 </html>
