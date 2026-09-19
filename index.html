@@ -555,7 +555,6 @@
       const inputEl = document.getElementById('callNumberInput');
       let rawInput = inputEl.value;
 
-      // หากเป็นการกดสลับประเภท ให้ใช้ข้อมูลล่าสุดหากในช่องว่างอยู่
       if (!rawInput.trim() && fromModeChange && lastRawInput) {
         rawInput = lastRawInput;
       }
@@ -574,16 +573,13 @@
         return;
       }
 
-      // บันทึกคำล่าสุดไว้สลับประเภท
       lastRawInput = str;
 
-      // แสดงข้อความที่กรอกเป็นตัวเล็กๆ เหนือผลลัพธ์
       if (rawDisplayEl) {
         rawDisplayEl.innerHTML = 'จาก Call No.: <span>' + escapeHtml(str) + '</span>';
         rawDisplayEl.classList.add('show');
       }
 
-      // เคลียข้อมูลในช่องที่ใช้กรอกข้อมูล
       inputEl.value = '';
 
       let lines = [];
@@ -595,7 +591,8 @@
         let year = '', accession = '', volParts = [];
 
         for (let t of tokens) {
-          if (!year && /^(18|19|20|25)\d{2}(?:-(?:18|19|20|25)?\d{2})?$/.test(t)) year = t;
+          // ปรับแก้ไขจุดที่ 1: ตรวจจับปี พ.ศ. / ค.ศ. เลข 4 หลักใดๆ (รวมถึงปีช่วง เช่น 2490-2495 หรือ 2020-21)
+          if (!year && /^[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?$/.test(t)) year = t;
           else if (!accession && /^\d+$/.test(t)) accession = t;
           else volParts.push(t);
         }
@@ -628,12 +625,14 @@
 
         // ดึงปี/เดือน-ปี/ช่วงเดือน-ปี
         const monthRegexStr = `(?:ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|Jan[a-zA-Z]*\\.?|Feb[a-zA-Z]*\\.?|Mar[a-zA-Z]*\\.?|Apr[a-zA-Z]*\\.?|May[a-zA-Z]*\\.?|Jun[a-zA-Z]*\\.?|Jul[a-zA-Z]*\\.?|Aug[a-zA-Z]*\\.?|Sep[a-zA-Z]*\\.?|Sept[a-zA-Z]*\\.?|Oct[a-zA-Z]*\\.?|Nov[a-zA-Z]*\\.?|Dec[a-zA-Z]*\\.?)`;
-        const yearRegexStr = `(?:18|19|20|25)\\d{2}`;
+        
+        // ปรับแก้ไขจุดที่ 2 และ 3: รองรับปีเลข 4 หลักช่วง 1000–2999 (ครอบคลุมทั้ง พ.ศ. และ ค.ศ. ทุกยุค)
+        const yearRegexStr = `(?:[12]\\d{3})`;
 
         const patternMonthYearRange = new RegExp(monthRegexStr + '\\s*' + yearRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
         const patternMonthRangeYear = new RegExp(monthRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
         const patternMonthYear = new RegExp(monthRegexStr + '\\s*' + yearRegexStr, 'i');
-        const yearPattern = /\b(?:18|19|20|25)\d{2}(?:-(?:18|19|20|25)?\d{2})?\b/;
+        const yearPattern = /\b[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?\b/;
 
         const yearMatch = str.match(patternMonthYearRange) ||
                           str.match(patternMonthRangeYear) ||
@@ -701,10 +700,8 @@
       }
 
       setPreview(lines.join('\n'), false);
-      // คัดลอกอัตโนมัติทุกครั้งที่ป้ายเปลี่ยน (สร้างใหม่หรือสลับประเภท)
       copyResult();
     }
-
     function handleKeyDown(event) {
       if (event.key === 'Enter') {
         event.preventDefault();
