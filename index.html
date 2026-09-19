@@ -3,153 +3,171 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
   <title>ระบบสร้าง Label เลขเรียกหนังสือ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-1: #eef2f6;
-      --bg-2: #e2e9f1;
+      --bg: #e9edee;
       --surface: #ffffff;
-      --border: #dde4ec;
-      --border-strong: #c7d2de;
-      --text: #26313f;
-      --text-muted: #64748b;
+      --ink: #1e2a2f;
+      --muted: #465960;
+      --line: #e3e8e8;
+      --line-strong: #aebbbc;
+      --track: #eff2f2;
+      --field: #f7f9f9;
+      --seg-active: #ffffff;
 
-      --primary: #2f6690;
-      --primary-dark: #234c6c;
-      --primary-soft: #e7eef4;
-      --primary-soft-border: #c3d6e5;
+      --accent: #2a6f7e;
+      --accent-strong: #1a4b57;
+      --accent-soft: rgba(35, 94, 108, .11);
+      --on-accent: #ffffff;
+      --ring: rgba(35, 94, 108, .30);
 
-      --accent: #b7791f;
-      --accent-dark: #8a5a13;
-      --accent-soft: #fbf1de;
+      --stage: #f1f4f4;
+      --dash: #c5d1ce;
+      --paper: #ffffff;
+      --paper-ink: #18232a;
+      --paper-line: #d9e2df;
 
-      --success: #2f7a52;
-      --shadow: 0 6px 20px rgba(38, 49, 63, 0.07);
-      --shadow-sm: 0 2px 8px rgba(38, 49, 63, 0.06);
-      --radius-lg: 16px;
-      --radius-md: 12px;
-      --radius-sm: 10px;
+      --shadow-card: 0 1px 2px rgba(20, 40, 45, .04), 0 10px 28px -16px rgba(20, 40, 45, .14);
+      --shadow-paper: 0 1px 1px rgba(20, 40, 45, .06), 0 8px 20px -10px rgba(20, 40, 45, .25);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Sarabun', sans-serif;
-      background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
-      color: var(--text);
-      font-size: 15px;
+      font-family: 'Sarabun', 'Noto Sans Thai', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      background: var(--bg);
+      color: var(--ink);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .app-header {
-      padding: 28px 20px 18px;
-      text-align: center;
+    .app {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px 16px 20px;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
       gap: 10px;
     }
 
-    .app-header .icon {
-      font-size: 22px;
-      line-height: 1;
+    /* ---------- header ---------- */
+    .app-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 4px;
+    }
+
+    .app-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      display: grid;
+      place-items: center;
+      flex: none;
     }
 
     .app-header h1 {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--primary-dark);
-      letter-spacing: 0.2px;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
     }
 
-    .main {
-      padding: 12px 16px 32px;
-      max-width: 520px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      flex: 1;
+    .app-mark svg.ico { width: 17px; height: 17px; }
+
+    svg.ico {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
+    /* ---------- cards ---------- */
     .card {
       background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 22px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow-card);
     }
 
-    /* --- section label --- */
     .field-label {
-      font-size: 13.5px;
-      font-weight: 600;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
+      display: block;
+      font-size: 12.5px;
+      font-weight: 400;
+      color: #5f6f76;
+      margin-bottom: 6px;
+    }
+
+    /* ---------- segmented control ---------- */
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 6px;
     }
 
-    /* --- category chips --- */
-    .ctx-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .ctx-chips {
-      display: flex;
-      gap: 8px;
-      flex-wrap: nowrap;
-    }
-
-    .chip {
-      flex: 1;
-      padding: 10px 6px;
-      border-radius: var(--radius-sm);
-      font-size: 12.5px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1.5px solid var(--border-strong);
+    .seg-btn {
+      font: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--ink);
       background: var(--surface);
-      color: var(--text);
-      transition: border-color .15s ease, color .15s ease, background-color .15s ease;
-      font-family: 'Sarabun', sans-serif;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .chip:hover {
-      border-color: var(--primary);
-      color: var(--primary-dark);
-      background: var(--primary-soft);
-    }
-
-    .chip.active-mode {
-      border-color: var(--primary);
-      background: var(--primary);
-      color: #ffffff;
-      box-shadow: var(--shadow-sm);
-    }
-
-    /* --- input row --- */
-    .scan-box {
-      margin-top: 18px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border);
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      min-height: 38px;
+      padding: 6px 4px;
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+    }
+
+    .seg-emoji { font-size: 15px; line-height: 1; }
+
+    .seg-btn:hover:not(.active-mode) {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .seg-btn.active-mode {
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(20, 40, 45, .2);
+    }
+
+    .mode-hint {
+      margin-top: 6px;
+      min-height: 19px;
+      font-size: 12px;
+      color: #66757b;
+      padding-left: 2px;
+    }
+
+    /* ---------- input ---------- */
+    .entry {
+      margin-top: 8px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
     }
 
     .input-row {
@@ -159,213 +177,322 @@
 
     #callNumberInput {
       flex: 1;
-      padding: 13px 16px;
+      min-width: 0;
+      height: 44px;
+      padding: 0 14px;
+      font: inherit;
       font-size: 16px;
-      font-family: 'Sarabun', sans-serif;
-      border: 1.5px solid var(--border-strong);
-      border-radius: var(--radius-sm);
+      color: var(--ink);
+      background: var(--field);
+      border: 1px solid var(--line);
+      border-radius: 11px;
       outline: none;
-      transition: border-color .15s ease, box-shadow .15s ease;
-      background: var(--bg-1);
-      color: var(--text);
+      transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
     }
+
+    #callNumberInput::placeholder { color: #5f6f76; opacity: 1; font-size: 15px; }
 
     #callNumberInput:focus {
-      border-color: var(--primary);
+      border-color: var(--accent);
       background: var(--surface);
-      box-shadow: 0 0 0 3px var(--primary-soft-border);
+      box-shadow: 0 0 0 4px var(--ring);
     }
 
-    #callNumberInput::placeholder {
-      color: #94a3b8;
-      font-size: 14px;
-    }
-
-    .btn-scan {
-      padding: 13px 22px;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 15px;
-      font-family: 'Sarabun', sans-serif;
-      font-weight: 700;
+    .btn-generate {
+      height: 44px;
+      padding: 0 22px;
+      font: inherit;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--on-accent);
+      background: var(--accent);
+      border: 0;
+      border-radius: 11px;
       cursor: pointer;
-      white-space: nowrap;
-      transition: background-color .15s ease;
-      box-shadow: var(--shadow-sm);
+      transition: background-color .15s ease, transform .05s ease;
     }
 
-    .btn-scan:hover {
-      background: var(--primary-dark);
-    }
+    .btn-generate:hover { background: var(--accent-strong); }
+    .btn-generate:active { transform: translateY(1px); }
 
-    .btn-scan:active {
-      background: var(--primary-dark);
-      transform: translateY(1px);
-    }
-
-    .sub-info {
-      color: var(--text-muted);
+    .key-hint {
+      margin-top: 6px;
       font-size: 13px;
+      color: var(--muted);
+      padding-left: 2px;
+    }
+
+    kbd {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 0 5px;
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      border-radius: 6px;
+      background: var(--field);
+      color: var(--ink);
+    }
+
+    /* ---------- result ---------- */
+    .result-head {
       display: flex;
       align-items: center;
-      gap: 6px;
-    }
-
-    /* --- result card --- */
-    .result-card {
-      background: var(--surface);
-    }
-
-    .result-header {
-      display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .result-head h2 {
+      font-size: 14.5px;
+      font-weight: 600;
     }
 
     .btn-copy {
-      background: var(--accent-soft);
-      color: var(--accent-dark);
-      border: 1.5px solid #e8c98a;
-      width: auto;
-      padding: 8px 16px;
-      font-size: 13.5px;
-      font-family: 'Sarabun', sans-serif;
-      font-weight: 600;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: background-color .15s ease, border-color .15s ease;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--accent-strong);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
     }
 
-    .btn-copy:hover {
-      background: #f6e3bb;
+    .btn-copy svg.ico { width: 16px; height: 16px; }
+    .btn-copy .i-check { display: none; }
+
+    .btn-copy:hover:not(:disabled) {
+      background: var(--accent-soft);
       border-color: var(--accent);
     }
 
+    .btn-copy:disabled { opacity: .45; cursor: default; }
+
+    .btn-copy.copied { border-color: var(--accent); background: var(--accent-soft); }
+    .btn-copy.copied .i-copy { display: none; }
+    .btn-copy.copied .i-check { display: block; }
+
+    /* พื้นที่วางป้าย: เน้นที่ผลลัพธ์เป็นหลัก */
+    .stage {
+      background: var(--stage);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: grid;
+      place-items: center;
+      min-height: 110px;
+    }
+
     .label-preview {
-      display: block;
-      background: var(--bg-1);
-      border: 1.5px dashed var(--border-strong);
-      padding: 22px 24px;
-      min-height: 64px;
-      border-radius: var(--radius-md);
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 1.3rem;
-      font-weight: 700;
-      line-height: 1.5;
+      min-width: 170px;
+      max-width: 100%;
+      padding: 12px 28px;
       text-align: left;
       white-space: pre-line;
-      color: var(--primary-dark);
+      word-break: break-word;
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: .01em;
+      color: var(--paper-ink);
+      background: var(--paper);
+      border: 1px solid var(--paper-line);
+      border-radius: 8px;
+      box-shadow: var(--shadow-paper);
       user-select: all;
+    }
+
+    .label-preview.is-empty {
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-align: center;
+      color: var(--muted);
+      background: transparent;
+      border: 1.5px dashed var(--dash);
+      box-shadow: none;
+      user-select: none;
+      min-width: 0;
+      padding: 20px 20px;
+    }
+
+    .label-preview::selection,
+    .label-preview *::selection {
+      background: rgba(35, 94, 108, .2);
+      color: inherit;
+    }
+
+    .label-preview.pop { animation: pop .22s ease-out; }
+
+    @keyframes pop {
+      from { opacity: .4; transform: translateY(4px); }
+      to   { opacity: 1;  transform: none; }
+    }
+
+    /* Call No. ที่กรอก: ตัวเล็ก สีจาง ไม่แย่งความสนใจจากผลลัพธ์ */
+    .raw-input-display {
+      display: none;
+      margin-top: 8px;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--muted);
       word-break: break-word;
     }
 
-    .toast {
-      color: var(--success);
-      font-size: 13px;
-      font-weight: 600;
-      margin-top: 10px;
-      min-height: 18px;
+    .raw-input-display.show { display: block; }
+    .raw-input-display span { font-weight: 400; margin-left: 2px; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
     }
 
     .note {
-      font-size: 12.5px;
-      color: var(--text-muted);
+      font-size: 13px;
+      color: var(--muted);
       text-align: center;
-      line-height: 1.5;
       padding: 0 8px;
     }
 
-    .note b {
-      color: var(--text);
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    #callNumberInput:focus-visible { outline: none; }
+
+    @media (max-width: 360px) {
+      .seg-btn { flex-direction: column; gap: 2px; min-height: 54px; }
+      .seg-emoji { font-size: 18px; }
     }
 
     @media (max-width: 380px) {
-      .chip {
-        font-size: 11px;
-        padding: 10px 4px;
-      }
-      .input-row {
-        flex-direction: column;
-      }
-      .btn-scan {
-        width: 100%;
-      }
+      .app { padding: 12px 12px 16px; }
+      .card { padding: 12px 14px; }
+      .input-row { flex-direction: column; }
+      #callNumberInput { flex: none; width: 100%; }
+      .btn-generate { width: 100%; }
+      .label-preview { padding: 12px 22px; font-size: 19px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; animation: none !important; }
     }
   </style>
 </head>
 <body>
+  <main class="app">
 
-  <!-- App Header -->
-  <div class="app-header">
-    <span class="icon">🏷️</span>
-    <h1>ระบบสร้าง Label เลขเรียกหนังสือ</h1>
-  </div>
-
-  <div class="main">
-    <!-- Card เลือกประเภท + กรอกข้อมูล -->
-    <div class="card">
-      <div class="ctx-group">
-        <div class="field-label">เลือกประเภทหนังสือ</div>
-        <div class="ctx-chips">
-          <button id="btn-normal" class="chip active-mode" onclick="setMode('normal')">📖 หนังสือทั่วไป</button>
-          <button id="btn-rare" class="chip" onclick="setMode('rare')">📜 หายาก</button>
-          <button id="btn-ref" class="chip" onclick="setMode('ref')">🔍 อ้างอิง</button>
-          <button id="btn-thesis" class="chip" onclick="setMode('thesis')">🎓 วิทยานิพนธ์</button>
-        </div>
+    <header class="app-header">
+      <div class="app-mark" aria-hidden="true">
+        <svg class="ico" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M9.5 8h5M9.5 12h5M9.5 16h3"/></svg>
       </div>
+      <h1>ระบบสร้าง Label เลขเรียกหนังสือ</h1>
+    </header>
 
-      <div class="scan-box">
-        <div class="field-label">🔢 กรอกเลขเรียกหนังสือ</div>
+    <!-- เลือกประเภท + กรอกข้อมูล -->
+    <section class="card" aria-label="ป้อนข้อมูล">
+      <span class="field-label" id="modeLabel">ประเภทหนังสือ</span>
+      <div class="segmented" role="radiogroup" aria-labelledby="modeLabel">
+        <button type="button" class="seg-btn active-mode" data-mode="normal" role="radio" aria-checked="true"  onclick="setMode('normal')"><span class="seg-emoji" aria-hidden="true">📖</span><span>ทั่วไป</span></button>
+        <button type="button" class="seg-btn" data-mode="rare"   role="radio" aria-checked="false" tabindex="-1" onclick="setMode('rare')"><span class="seg-emoji" aria-hidden="true">📜</span><span>หายาก</span></button>
+        <button type="button" class="seg-btn" data-mode="ref"    role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ref')"><span class="seg-emoji" aria-hidden="true">🔍</span><span>อ้างอิง</span></button>
+        <button type="button" class="seg-btn" data-mode="thesis" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('thesis')"><span class="seg-emoji" aria-hidden="true">🎓</span><span>วพ</span></button>
+      </div>
+      <p class="mode-hint" id="modeHint">รวมถึงหนังสือ CRE / DOC</p>
+
+      <div class="entry">
+        <label class="field-label" for="callNumberInput">เลขเรียกหนังสือ</label>
         <div class="input-row">
           <input
             type="text"
             id="callNumberInput"
-            placeholder="กรอกเลขเรียกหนังสือที่นี่..."
+            placeholder="กรอกเลขเรียกหนังสือที่นี่"
+            autocomplete="off"
             onkeydown="handleKeyDown(event)"
             autofocus
           >
-          <button class="btn-scan" onclick="generateLabel()">สร้าง ↵</button>
+          <button type="button" class="btn-generate" onclick="generateLabel()">สร้าง</button>
         </div>
-        <div class="sub-info">📌 หนังสือทั่วไป รวมถึง CRE / DOC</div>
+        <p class="key-hint">กด <kbd>Enter</kbd> เพื่อสร้างได้ทันที</p>
       </div>
-    </div>
+    </section>
 
-    <!-- Card ผลลัพธ์ -->
-    <div class="card result-card">
-      <div class="result-header">
-        <div class="field-label">📋 ผลลัพธ์ Label</div>
-        <button class="btn-copy" onclick="copyResult()">📋 คัดลอก</button>
+    <!-- ผลลัพธ์ -->
+    <section class="card" aria-label="ผลลัพธ์">
+      <div class="result-head">
+        <h2>ผลลัพธ์</h2>
+        <button type="button" class="btn-copy" id="copyBtn" onclick="copyResult()" disabled>
+          <svg class="ico i-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H16"/></svg>
+          <svg class="ico i-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          <span class="btn-text">คัดลอก</span>
+        </button>
       </div>
-      <div id="labelPreview" class="label-preview">-</div>
-      <div id="copyToast" class="toast"></div>
-    </div>
 
-    <div class="note">
-      💡 เมื่อผลลัพธ์แสดงแล้ว ข้อความจะถูกคลุมดำให้อัตโนมัติ สามารถกด <b>Ctrl + C</b> คัดลอกได้ทันที
-    </div>
-  </div>
+      <div class="stage">
+        <div id="labelPreview" class="label-preview is-empty">ผลลัพธ์จะแสดงที่นี่</div>
+      </div>
+
+      <div id="rawInputDisplay" class="raw-input-display"></div>
+      <div id="copyToast" class="sr-only" role="status" aria-live="polite"></div>
+    </section>
+
+    <p class="note">ผลลัพธ์จะถูกเลือกไว้ให้อัตโนมัติ กด <kbd>Ctrl</kbd> + <kbd>C</kbd> เพื่อคัดลอกได้เลย</p>
+
+  </main>
 
   <script>
+
     let currentMode = 'normal';
+    let lastRawInput = '';
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    const MODE_HINTS = {
+      normal: 'รวมถึงหนังสือ CRE / DOC',
+      rare:   'เติม ก หรือ Ra ไว้บรรทัดแรก',
+      ref:    'เติม อ หรือ R ไว้บรรทัดแรก',
+      thesis: 'เติม วพ หรือ T ไว้บรรทัดแรก'
+    };
 
     function setMode(mode) {
       currentMode = mode;
-      document.querySelectorAll('.ctx-chips .chip').forEach(btn => btn.classList.remove('active-mode'));
-      
-      if (mode === 'normal') document.getElementById('btn-normal').classList.add('active-mode');
-      if (mode === 'rare') document.getElementById('btn-rare').classList.add('active-mode');
-      if (mode === 'ref') document.getElementById('btn-ref').classList.add('active-mode');
-      if (mode === 'thesis') document.getElementById('btn-thesis').classList.add('active-mode');
+      document.querySelectorAll('.seg-btn').forEach(btn => {
+        const on = btn.dataset.mode === mode;
+        btn.classList.toggle('active-mode', on);
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+        btn.tabIndex = on ? 0 : -1;
+      });
+      document.getElementById('modeHint').textContent = MODE_HINTS[mode] || '';
 
       const input = document.getElementById('callNumberInput').value;
-      if (input.trim()) {
-        generateLabel();
+      if (input.trim() || lastRawInput) {
+        generateLabel(true);
+      }
+    }
+
+    function setPreview(text, isEmpty) {
+      const el = document.getElementById('labelPreview');
+      el.innerText = text;
+      el.classList.toggle('is-empty', isEmpty);
+      document.getElementById('copyBtn').disabled = isEmpty;
+      if (!isEmpty) {
+        el.classList.remove('pop');
+        void el.offsetWidth;
+        el.classList.add('pop');
       }
     }
 
@@ -420,16 +547,40 @@
       return cutterLines;
     }
 
-    function generateLabel() {
-      const rawInput = document.getElementById('callNumberInput').value;
+    function generateLabel(fromModeChange = false) {
+      const inputEl = document.getElementById('callNumberInput');
+      let rawInput = inputEl.value;
+
+      // หากเป็นการกดสลับประเภท ให้ใช้ข้อมูลล่าสุดหากในช่องว่างอยู่
+      if (!rawInput.trim() && fromModeChange && lastRawInput) {
+        rawInput = lastRawInput;
+      }
+
       const previewEl = document.getElementById('labelPreview');
+      const rawDisplayEl = document.getElementById('rawInputDisplay');
       document.getElementById('copyToast').innerText = '';
 
       let str = rawInput.trim();
       if (!str) {
-        previewEl.innerText = 'กรุณากรอกข้อมูล';
+        setPreview('กรุณากรอกข้อมูล', true);
+        if (rawDisplayEl) {
+          rawDisplayEl.innerHTML = '';
+          rawDisplayEl.classList.remove('show');
+        }
         return;
       }
+
+      // บันทึกคำล่าสุดไว้สลับประเภท
+      lastRawInput = str;
+
+      // แสดงข้อความที่กรอกเป็นตัวเล็กๆ เหนือผลลัพธ์
+      if (rawDisplayEl) {
+        rawDisplayEl.innerHTML = 'จาก Call No.: <span>' + escapeHtml(str) + '</span>';
+        rawDisplayEl.classList.add('show');
+      }
+
+      // เคลียข้อมูลในช่องที่ใช้กรอกข้อมูล
+      inputEl.value = '';
 
       let lines = [];
 
@@ -471,7 +622,7 @@
           }
         }
 
-        // ดึงปี/เดือน-ปี/ช่วงเดือน-ปี (เช่น ม.ค.2539-ธ.ค.2541, Jan.1991-Dec.1997, 1999-2000, 2547)
+        // ดึงปี/เดือน-ปี/ช่วงเดือน-ปี
         const monthRegexStr = `(?:ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|Jan[a-zA-Z]*\\.?|Feb[a-zA-Z]*\\.?|Mar[a-zA-Z]*\\.?|Apr[a-zA-Z]*\\.?|May[a-zA-Z]*\\.?|Jun[a-zA-Z]*\\.?|Jul[a-zA-Z]*\\.?|Aug[a-zA-Z]*\\.?|Sep[a-zA-Z]*\\.?|Sept[a-zA-Z]*\\.?|Oct[a-zA-Z]*\\.?|Nov[a-zA-Z]*\\.?|Dec[a-zA-Z]*\\.?)`;
         const yearRegexStr = `(?:18|19|20|25)\\d{2}`;
 
@@ -493,7 +644,7 @@
           restAfterYear = str.substring(idx + year.length).trim();
         }
 
-        // ดึงช่วงเดือนโดดๆ (เช่น ม.ค.-มี.ค., Oct.-Dec.)
+        // ดึงช่วงเดือนโดดๆ
         const monthPattern = /(?:[\u0E00-\u0E7F]+\.[\u0E00-\u0E7F]+\.-[\u0E00-\u0E7F]+\.[\u0E00-\u0E7F]+\.?|[A-Za-z]{3,4}\.?-[A-Za-z]{3,4}\.?)/i;
         let monthStr = '';
         const monthMatchAfter = restAfterYear.match(monthPattern);
@@ -545,7 +696,7 @@
         lines.push(...volPartLines);
       }
 
-      previewEl.innerText = lines.join('\n');
+      setPreview(lines.join('\n'), false);
       selectText('labelPreview');
     }
 
@@ -566,16 +717,50 @@
       selection.addRange(range);
     }
 
-    function copyResult() {
-      const text = document.getElementById('labelPreview').innerText;
-      if (!text || text === '-' || text === 'กรุณากรอกข้อมูล') return;
-
-      navigator.clipboard.writeText(text).then(() => {
-        const toast = document.getElementById('copyToast');
-        toast.innerText = '✓ คัดลอกเรียบร้อย!';
-        setTimeout(() => { toast.innerText = ''; }, 2000);
-      });
+    let copyTimer;
+    function showCopied() {
+      const btn = document.getElementById('copyBtn');
+      btn.classList.add('copied');
+      btn.querySelector('.btn-text').textContent = 'คัดลอกแล้ว';
+      document.getElementById('copyToast').textContent = 'คัดลอกเรียบร้อย';
+      clearTimeout(copyTimer);
+      copyTimer = setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.querySelector('.btn-text').textContent = 'คัดลอก';
+        document.getElementById('copyToast').textContent = '';
+      }, 2000);
     }
+
+    function copyResult() {
+      const el = document.getElementById('labelPreview');
+      if (el.classList.contains('is-empty')) return;
+      const text = el.innerText;
+
+      const fallback = () => {
+        selectText('labelPreview');
+        try { if (document.execCommand('copy')) showCopied(); } catch (e) {}
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(showCopied).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+  
+
+    // เลือกประเภทด้วยคีย์บอร์ด: ลูกศรซ้าย/ขวา (หรือขึ้น/ลง)
+    document.querySelector('.segmented').addEventListener('keydown', function (e) {
+      const keys = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'];
+      if (!keys.includes(e.key)) return;
+      e.preventDefault();
+      const btns = Array.from(document.querySelectorAll('.seg-btn'));
+      const i = btns.findIndex(b => b.dataset.mode === currentMode);
+      const step = (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 1;
+      const next = btns[(i + step + btns.length) % btns.length];
+      next.focus();
+      setMode(next.dataset.mode);
+    });
   </script>
 </body>
 </html>
