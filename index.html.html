@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบสร้าง Label เลขเรียกหนังสือ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #eef2f6;
+      --bg-2: #e2e9f1;
+      --surface: #ffffff;
+      --border: #dde4ec;
+      --border-strong: #c7d2de;
+      --text: #26313f;
+      --text-muted: #64748b;
+
+      --primary: #2f6690;
+      --primary-dark: #234c6c;
+      --primary-soft: #e7eef4;
+      --primary-soft-border: #c3d6e5;
+
+      --accent: #b7791f;
+      --accent-dark: #8a5a13;
+      --accent-soft: #fbf1de;
+
+      --success: #2f7a52;
+      --shadow: 0 6px 20px rgba(38, 49, 63, 0.07);
+      --shadow-sm: 0 2px 8px rgba(38, 49, 63, 0.06);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      color: var(--text);
+      font-size: 15px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      padding: 28px 20px 18px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .app-header .icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .app-header h1 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      letter-spacing: 0.2px;
+    }
+
+    .main {
+      padding: 12px 16px 32px;
+      max-width: 520px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    /* --- section label --- */
+    .field-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* --- category chips --- */
+    .ctx-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ctx-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .chip {
+      flex: 1;
+      padding: 10px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      transition: border-color .15s ease, color .15s ease, background-color .15s ease;
+      font-family: 'Sarabun', sans-serif;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chip:hover {
+      border-color: var(--primary);
+      color: var(--primary-dark);
+      background: var(--primary-soft);
+    }
+
+    .chip.active-mode {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* --- input row --- */
+    .scan-box {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    #callNumberInput {
+      flex: 1;
+      padding: 13px 16px;
+      font-size: 16px;
+      font-family: 'Sarabun', sans-serif;
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+      background: var(--bg-1);
+      color: var(--text);
+    }
+
+    #callNumberInput:focus {
+      border-color: var(--primary);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px var(--primary-soft-border);
+    }
+
+    #callNumberInput::placeholder {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .btn-scan {
+      padding: 13px 22px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: 'Sarabun', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color .15s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-scan:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-scan:active {
+      background: var(--primary-dark);
+      transform: translateY(1px);
+    }
+
+    .sub-info {
+      color: var(--text-muted);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* --- result card --- */
+    .result-card {
+      background: var(--surface);
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .btn-copy {
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      border: 1.5px solid #e8c98a;
+      width: auto;
+      padding: 8px 16px;
+      font-size: 13.5px;
+      font-family: 'Sarabun', sans-serif;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background-color .15s ease, border-color .15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-copy:hover {
+      background: #f6e3bb;
+      border-color: var(--accent);
+    }
+
+    .label-preview {
+      display: block;
+      background: var(--bg-1);
+      border: 1.5px dashed var(--border-strong);
+      padding: 22px 24px;
+      min-height: 64px;
+      border-radius: var(--radius-md);
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: left;
+      white-space: pre-line;
+      color: var(--primary-dark);
+      user-select: all;
+      word-break: break-word;
+    }
+
+    .toast {
+      color: var(--success);
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 10px;
+      min-height: 18px;
+    }
+
+    .note {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.5;
+      padding: 0 8px;
+    }
+
+    .note b {
+      color: var(--text);
+    }
+
+    @media (max-width: 380px) {
+      .chip {
+        font-size: 11px;
+        padding: 10px 4px;
+      }
+      .input-row {
+        flex-direction: column;
+      }
+      .btn-scan {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Header -->
+  <div class="app-header">
+    <span class="icon">🏷️</span>
+    <h1>ระบบสร้าง Label เลขเรียกหนังสือ</h1>
+  </div>
+
+  <div class="main">
+    <!-- Card เลือกประเภท + กรอกข้อมูล -->
+    <div class="card">
+      <div class="ctx-group">
+        <div class="field-label">เลือกประเภทหนังสือ</div>
+        <div class="ctx-chips">
+          <button id="btn-normal" class="chip active-mode" onclick="setMode('normal')">📖 หนังสือทั่วไป</button>
+          <button id="btn-rare" class="chip" onclick="setMode('rare')">📜 หายาก</button>
+          <button id="btn-ref" class="chip" onclick="setMode('ref')">🔍 อ้างอิง</button>
+          <button id="btn-thesis" class="chip" onclick="setMode('thesis')">🎓 วิทยานิพนธ์</button>
+        </div>
+      </div>
+
+      <div class="scan-box">
+        <div class="field-label">🔢 กรอกเลขเรียกหนังสือ</div>
+        <div class="input-row">
+          <input
+            type="text"
+            id="callNumberInput"
+            placeholder="กรอกเลขเรียกหนังสือที่นี่..."
+            onkeydown="handleKeyDown(event)"
+            autofocus
+          >
+          <button class="btn-scan" onclick="generateLabel()">สร้าง ↵</button>
+        </div>
+        <div class="sub-info">📌 หนังสือทั่วไป รวมถึง CRE / DOC</div>
+      </div>
+    </div>
+
+    <!-- Card ผลลัพธ์ -->
+    <div class="card result-card">
+      <div class="result-header">
+        <div class="field-label">📋 ผลลัพธ์ Label</div>
+        <button class="btn-copy" onclick="copyResult()">📋 คัดลอก</button>
+      </div>
+      <div id="labelPreview" class="label-preview">-</div>
+      <div id="copyToast" class="toast"></div>
+    </div>
+
+    <div class="note">
+      💡 เมื่อผลลัพธ์แสดงแล้ว ข้อความจะถูกคลุมดำให้อัตโนมัติ สามารถกด <b>Ctrl + C</b> คัดลอกได้ทันที
+    </div>
+  </div>
+
+  <script>
+    let currentMode = 'normal';
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.ctx-chips .chip').forEach(btn => btn.classList.remove('active-mode'));
+      
+      if (mode === 'normal') document.getElementById('btn-normal').classList.add('active-mode');
+      if (mode === 'rare') document.getElementById('btn-rare').classList.add('active-mode');
+      if (mode === 'ref') document.getElementById('btn-ref').classList.add('active-mode');
+      if (mode === 'thesis') document.getElementById('btn-thesis').classList.add('active-mode');
+
+      const input = document.getElementById('callNumberInput').value;
+      if (input.trim()) {
+        generateLabel();
+      }
+    }
+
+    function hasThai(str) {
+      return /[\u0E00-\u0E7F]/i.test(str);
+    }
+
+    function getPrefixForMode(mode, inputStr) {
+      if (mode === 'normal') return null;
+      const isThai = hasThai(inputStr);
+      if (mode === 'rare') return isThai ? 'ก' : 'Ra';
+      if (mode === 'ref') return isThai ? 'อ' : 'R';
+      if (mode === 'thesis') return isThai ? 'วพ' : 'T';
+      return null;
+    }
+
+    function countLetters(str) {
+      const matches = str.match(/[^\d\s\.]/g);
+      return matches ? matches.length : 0;
+    }
+
+    function parseCutters(rawCutterStr) {
+      if (!rawCutterStr) return [];
+      let clean = rawCutterStr.replace(/\./g, ' ').trim();
+      if (!clean) return [];
+
+      const units = clean.match(/[^\d\s]+\d*/g) || clean.split(/\s+/);
+      const cutterLines = [];
+      let currentLine = '';
+      let currentLetterCount = 0;
+
+      for (let unit of units) {
+        unit = unit.replace(/\./g, '');
+        const unitLetters = countLetters(unit);
+
+        if (!currentLine) {
+          currentLine = unit;
+          currentLetterCount = unitLetters;
+        } else {
+          if (currentLetterCount + unitLetters <= 2) {
+            currentLine += unit;
+            currentLetterCount += unitLetters;
+          } else {
+            cutterLines.push(currentLine);
+            currentLine = unit;
+            currentLetterCount = unitLetters;
+          }
+        }
+      }
+      if (currentLine) cutterLines.push(currentLine);
+
+      return cutterLines;
+    }
+
+    function generateLabel() {
+      const rawInput = document.getElementById('callNumberInput').value;
+      const previewEl = document.getElementById('labelPreview');
+      document.getElementById('copyToast').innerText = '';
+
+      let str = rawInput.trim();
+      if (!str) {
+        previewEl.innerText = 'กรุณากรอกข้อมูล';
+        return;
+      }
+
+      let lines = [];
+
+      // เงื่อนไข CRE
+      if (/CRE/i.test(str)) {
+        let clean = str.replace(/^(Ra|ก|อ|R|วพ|T)\s+/i, '').replace(/^CRE\s+/i, '').trim();
+        const tokens = clean.split(/\s+/).filter(t => t.length > 0);
+        let year = '', accession = '', volParts = [];
+
+        for (let t of tokens) {
+          if (!year && /^(18|19|20|25)\d{2}(?:-(?:18|19|20|25)?\d{2})?$/.test(t)) year = t;
+          else if (!accession && /^\d+$/.test(t)) accession = t;
+          else volParts.push(t);
+        }
+
+        lines = ['Ra', 'CRE'];
+        if (year) lines.push(year);
+        if (accession) lines.push(accession);
+        if (volParts.length > 0) lines.push(volParts.join(' '));
+      } else {
+        const prefixLine = getPrefixForMode(currentMode, str);
+        str = str.replace(/^(Ra|ก|อ|R|วพ|T)\s+/i, '');
+
+        // นิยาย
+        const ficMatch = str.match(/^(นว|Fic|กต|Comic)[\s\.]*/i);
+        let ficPrefix = null;
+        if (ficMatch) {
+          ficPrefix = ficMatch[1];
+          str = str.substring(ficMatch[0].length).trim();
+        }
+
+        let classPrefix = '', classNum = '';
+        if (!ficPrefix) {
+          const classMatch = str.match(/^([A-Za-z\u0E00-\u0E7F]+)\s*(\d+(?:\.\d+)?)/);
+          if (classMatch) {
+            classPrefix = classMatch[1];
+            classNum = classMatch[2];
+            str = str.substring(classMatch[0].length).trim();
+          }
+        }
+
+        // ดึงปี/เดือน-ปี/ช่วงเดือน-ปี (เช่น ม.ค.2539-ธ.ค.2541, Jan.1991-Dec.1997, 1999-2000, 2547)
+        const monthRegexStr = `(?:ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|Jan[a-zA-Z]*\\.?|Feb[a-zA-Z]*\\.?|Mar[a-zA-Z]*\\.?|Apr[a-zA-Z]*\\.?|May[a-zA-Z]*\\.?|Jun[a-zA-Z]*\\.?|Jul[a-zA-Z]*\\.?|Aug[a-zA-Z]*\\.?|Sep[a-zA-Z]*\\.?|Sept[a-zA-Z]*\\.?|Oct[a-zA-Z]*\\.?|Nov[a-zA-Z]*\\.?|Dec[a-zA-Z]*\\.?)`;
+        const yearRegexStr = `(?:18|19|20|25)\\d{2}`;
+
+        const patternMonthYearRange = new RegExp(monthRegexStr + '\\s*' + yearRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
+        const patternMonthRangeYear = new RegExp(monthRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
+        const patternMonthYear = new RegExp(monthRegexStr + '\\s*' + yearRegexStr, 'i');
+        const yearPattern = /\b(?:18|19|20|25)\d{2}(?:-(?:18|19|20|25)?\d{2})?\b/;
+
+        const yearMatch = str.match(patternMonthYearRange) ||
+                          str.match(patternMonthRangeYear) ||
+                          str.match(patternMonthYear) ||
+                          str.match(yearPattern);
+
+        let year = '', restBeforeYear = str, restAfterYear = '';
+        if (yearMatch) {
+          year = yearMatch[0];
+          const idx = yearMatch.index;
+          restBeforeYear = str.substring(0, idx).trim();
+          restAfterYear = str.substring(idx + year.length).trim();
+        }
+
+        // ดึงช่วงเดือนโดดๆ (เช่น ม.ค.-มี.ค., Oct.-Dec.)
+        const monthPattern = /(?:[\u0E00-\u0E7F]+\.[\u0E00-\u0E7F]+\.-[\u0E00-\u0E7F]+\.[\u0E00-\u0E7F]+\.?|[A-Za-z]{3,4}\.?-[A-Za-z]{3,4}\.?)/i;
+        let monthStr = '';
+        const monthMatchAfter = restAfterYear.match(monthPattern);
+        if (monthMatchAfter) {
+          monthStr = monthMatchAfter[0];
+          restAfterYear = (restAfterYear.substring(0, monthMatchAfter.index) + ' ' + restAfterYear.substring(monthMatchAfter.index + monthStr.length)).trim();
+        } else {
+          const monthMatchBefore = restBeforeYear.match(monthPattern);
+          if (monthMatchBefore) {
+            monthStr = monthMatchBefore[0];
+            restBeforeYear = (restBeforeYear.substring(0, monthMatchBefore.index) + ' ' + restBeforeYear.substring(monthMatchBefore.index + monthStr.length)).trim();
+          }
+        }
+
+        // ดึงเล่ม/ตอน/Part
+        let volAndPartsStr = restAfterYear;
+        let cutterStr = restBeforeYear;
+
+        if (!year && !monthStr) {
+          const volPartMatch = cutterStr.match(/(?:\s+|^)((?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|pt\.|Pt\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|part|Part)\s*\d+.*)$/i);
+          if (volPartMatch) {
+            volAndPartsStr = volPartMatch[1].trim();
+            cutterStr = cutterStr.substring(0, volPartMatch.index).trim();
+          }
+        }
+
+        let volPartLines = [];
+        if (volAndPartsStr) {
+          const tokens = volAndPartsStr.match(/(?:ล\.|เล่ม|v\.|V\.|c\.|C\.|bd\.|vol\.|Vol\.|ฉ\.|ต\.|ตอน|pt\.|Pt\.|part|Part)\s*\d+[a-zA-Z\u0E00-\u0E7F]*/gi);
+          if (tokens) {
+            volPartLines = tokens.map(t => t.trim());
+          } else {
+            volPartLines = [volAndPartsStr];
+          }
+        }
+
+        const cutterLines = parseCutters(cutterStr);
+
+        if (prefixLine) lines.push(prefixLine);
+        if (ficPrefix) {
+          lines.push(ficPrefix);
+        } else {
+          if (classPrefix) lines.push(classPrefix);
+          if (classNum) lines.push(classNum);
+        }
+        lines.push(...cutterLines);
+        if (year) lines.push(year);
+        if (monthStr) lines.push(monthStr);
+        lines.push(...volPartLines);
+      }
+
+      previewEl.innerText = lines.join('\n');
+      selectText('labelPreview');
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        generateLabel();
+      }
+    }
+
+    function selectText(elementId) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    function copyResult() {
+      const text = document.getElementById('labelPreview').innerText;
+      if (!text || text === '-' || text === 'กรุณากรอกข้อมูล') return;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('copyToast');
+        toast.innerText = '✓ คัดลอกเรียบร้อย!';
+        setTimeout(() => { toast.innerText = ''; }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
