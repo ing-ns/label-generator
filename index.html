@@ -407,7 +407,7 @@
         <button type="button" class="seg-btn" data-mode="ref"    role="radio" aria-checked="false" tabindex="-1" onclick="setMode('ref')"><span class="seg-emoji" aria-hidden="true">🔍</span><span>อ้างอิง</span></button>
         <button type="button" class="seg-btn" data-mode="thesis" role="radio" aria-checked="false" tabindex="-1" onclick="setMode('thesis')"><span class="seg-emoji" aria-hidden="true">🎓</span><span>วพ</span></button>
       </div>
-      <p class="mode-hint" id="modeHint">รวมถึงหนังสือนิยาย / การ์ตูน / DOC</p>
+      <p class="mode-hint" id="modeHint">รวมถึงนิยาย / การ์ตูน / DOC</p>
 
       <div class="entry">
         <label class="field-label" for="callNumberInput">เลขเรียกหนังสือ</label>
@@ -464,10 +464,10 @@
     }
 
     const MODE_HINTS = {
-      normal: 'รวมถึงหนังสือ CRE / DOC',
-      rare:   'เติม ก (ไทย) หรือ Ra (อังกฤษ) ไว้บรรทัดแรก',
-      ref:    'เติม อ (ไทย) หรือ R (อังกฤษ) ไว้บรรทัดแรก',
-      thesis: 'เติม วพ (ไทย) หรือ T (อังกฤษ) ไว้บรรทัดแรก'
+      normal: 'รวมถึงนิยาย / การ์ตูน / DOC',
+      rare:   'เติม ก หรือ Ra ไว้บรรทัดแรก',
+      ref:    'เติม อ หรือ R ไว้บรรทัดแรก',
+      thesis: 'เติม วพ หรือ T ไว้บรรทัดแรก'
     };
 
     function setMode(mode) {
