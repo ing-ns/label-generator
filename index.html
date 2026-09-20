@@ -235,18 +235,6 @@
     }
 
     /* ---------- result ---------- */
-    .line-count-tag {
-      font-size: 12px;
-      font-weight: 400;
-      color: var(--muted);
-      background: var(--track);
-      padding: 2px 8px;
-      border-radius: 20px;
-      margin-left: 6px;
-      display: inline-block;
-      vertical-align: middle;
-    }
-
     .result-head {
       display: flex;
       align-items: center;
@@ -258,6 +246,19 @@
     .result-head h2 {
       font-size: 14.5px;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .line-count-tag {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      padding: 1px 8px;
+      border-radius: 20px;
+      line-height: 1.4;
     }
 
     .btn-copy {
