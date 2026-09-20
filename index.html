@@ -248,18 +248,41 @@
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
+    /* ป้ายแสดงจำนวนบรรทัดที่ปรับปรุงดีไซน์แล้ว */
     .line-count-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       font-size: 12px;
-      font-weight: 500;
-      color: #404040;
-      background: #f0f2f3;
-      border: 1.5px solid #666666;
-      padding: 1px 8px;
+      font-weight: 600;
+      color: var(--muted);
+      background: var(--field);
+      border: 1px solid var(--line);
+      padding: 3px 10px;
       border-radius: 20px;
-      line-height: 1.4;
+      line-height: 1.2;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+
+    .line-count-tag.active {
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+      border-color: rgba(42, 111, 126, 0.3);
+      box-shadow: 0 2px 6px rgba(42, 111, 126, 0.1);
+    }
+
+    .line-ico {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      fill: none;
+      opacity: 0.85;
     }
 
     .btn-copy {
@@ -295,7 +318,7 @@
     .btn-copy.copied .i-copy { display: none; }
     .btn-copy.copied .i-check { display: block; }
 
-    /* พื้นที่วางป้าย: เน้นที่ผลลัพธ์เป็นหลัก */
+    /* พื้นที่วางป้าย */
     .stage {
       background: var(--stage);
       border-radius: 12px;
@@ -351,7 +374,6 @@
       to   { opacity: 1;  transform: none; }
     }
 
-    /* Call No. ที่กรอก: ตัวเล็ก สีจาง ไม่แย่งความสนใจจากผลลัพธ์ */
     .raw-input-display {
       display: none;
       margin-top: 8px;
@@ -443,7 +465,17 @@
     <!-- ผลลัพธ์ -->
     <section class="card" aria-label="ผลลัพธ์">
       <div class="result-head">
-        <h2>ผลลัพธ์ <span id="lineCount" class="line-count-tag">- บรรทัด</span></h2>
+        <h2>
+          ผลลัพธ์ 
+          <span id="lineCount" class="line-count-tag">
+            <svg class="line-ico" viewBox="0 0 24 24" aria-hidden="true">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="14" y2="18"></line>
+            </svg>
+            <span id="lineCountText">- บรรทัด</span>
+          </span>
+        </h2>
         <button type="button" class="btn-copy" id="copyBtn" onclick="copyResult()" disabled>
           <svg class="ico i-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H16"/></svg>
           <svg class="ico i-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
@@ -506,12 +538,16 @@
       el.classList.toggle('is-empty', isEmpty);
 
       const lineCountEl = document.getElementById('lineCount');
-      if (lineCountEl) {
+      const countTextEl = document.getElementById('lineCountText');
+
+      if (lineCountEl && countTextEl) {
         if (isEmpty) {
-          lineCountEl.textContent = '- บรรทัด';
+          countTextEl.textContent = '- บรรทัด';
+          lineCountEl.classList.remove('active');
         } else {
           const lines = text.split('\n');
-          lineCountEl.textContent = lines.length + ' บรรทัด';
+          countTextEl.textContent = lines.length + ' บรรทัด';
+          lineCountEl.classList.add('active');
         }
       }
 
