@@ -235,6 +235,18 @@
     }
 
     /* ---------- result ---------- */
+    .line-count-tag {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      background: var(--track);
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 6px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
     .result-head {
       display: flex;
       align-items: center;
@@ -429,7 +441,7 @@
     <!-- ผลลัพธ์ -->
     <section class="card" aria-label="ผลลัพธ์">
       <div class="result-head">
-        <h2>ผลลัพธ์</h2>
+        <h2>ผลลัพธ์ <span id="lineCount" class="line-count-tag">- บรรทัด</span></h2>
         <button type="button" class="btn-copy" id="copyBtn" onclick="copyResult()" disabled>
           <svg class="ico i-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H16"/></svg>
           <svg class="ico i-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
@@ -490,6 +502,17 @@
       const el = document.getElementById('labelPreview');
       el.innerText = text;
       el.classList.toggle('is-empty', isEmpty);
+
+      const lineCountEl = document.getElementById('lineCount');
+      if (lineCountEl) {
+        if (isEmpty) {
+          lineCountEl.textContent = '- บรรทัด';
+        } else {
+          const lines = text.split('\n');
+          lineCountEl.textContent = lines.length + ' บรรทัด';
+        }
+      }
+
       copiedState = false;
       clearTimeout(copyTimer);
       renderCopyBtn();
@@ -591,7 +614,6 @@
         let year = '', accession = '', volParts = [];
 
         for (let t of tokens) {
-          // ปรับแก้ไขจุดที่ 1: ตรวจจับปี พ.ศ. / ค.ศ. เลข 4 หลักใดๆ (รวมถึงปีช่วง เช่น 2490-2495 หรือ 2020-21)
           if (!year && /^[12]\d{3}(?:-(?:[12]\d{3}|\d{2}))?$/.test(t)) year = t;
           else if (!accession && /^\d+$/.test(t)) accession = t;
           else volParts.push(t);
@@ -626,7 +648,6 @@
         // ดึงปี/เดือน-ปี/ช่วงเดือน-ปี
         const monthRegexStr = `(?:ม\\.ค\\.?|ก\\.พ\\.?|มี\\.ค\\.?|เม\\.ย\\.?|พ\\.ค\\.?|มิ\\.ย\\.?|ก\\.ค\\.?|ส\\.ค\\.?|ก\\.ย\\.?|ต\\.ค\\.?|พ\\.ย\\.?|ธ\\.ค\\.?|มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม|Jan[a-zA-Z]*\\.?|Feb[a-zA-Z]*\\.?|Mar[a-zA-Z]*\\.?|Apr[a-zA-Z]*\\.?|May[a-zA-Z]*\\.?|Jun[a-zA-Z]*\\.?|Jul[a-zA-Z]*\\.?|Aug[a-zA-Z]*\\.?|Sep[a-zA-Z]*\\.?|Sept[a-zA-Z]*\\.?|Oct[a-zA-Z]*\\.?|Nov[a-zA-Z]*\\.?|Dec[a-zA-Z]*\\.?)`;
         
-        // ปรับแก้ไขจุดที่ 2 และ 3: รองรับปีเลข 4 หลักช่วง 1000–2999 (ครอบคลุมทั้ง พ.ศ. และ ค.ศ. ทุกยุค)
         const yearRegexStr = `(?:[12]\\d{3})`;
 
         const patternMonthYearRange = new RegExp(monthRegexStr + '\\s*' + yearRegexStr + '\\s*-\\s*' + monthRegexStr + '\\s*' + yearRegexStr, 'i');
@@ -702,6 +723,7 @@
       setPreview(lines.join('\n'), false);
       copyResult();
     }
+
     function handleKeyDown(event) {
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -720,7 +742,6 @@
     }
 
     // ---------- คัดลอกอัตโนมัติ ----------
-    // ทุกครั้งที่สร้าง/เปลี่ยนป้าย ระบบคัดลอกให้เอง ปุ่ม "คัดลอก" ไว้เป็นทางสำรอง
     let copiedState = false;
     let copyTimer;
 
