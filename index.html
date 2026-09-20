@@ -721,6 +721,13 @@
         lines.push(...volPartLines);
       }
 
+      // หากมีมากกว่า 7 บรรทัด ให้นำบรรทัดที่ 7 เป็นต้นไปมารวมไว้ที่บรรทัดที่ 7
+      if (lines.length > 7) {
+        const top6 = lines.slice(0, 6);
+        const rest = lines.slice(6).join(' ');
+        lines = [...top6, rest];
+      }
+
       setPreview(lines.join('\n'), false);
       copyResult();
     }
